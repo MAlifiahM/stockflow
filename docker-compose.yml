@@ -61,5 +61,25 @@ services:
           psql -v ON_ERROR_STOP=1 -f "$$file"
         done
 
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: stockflow-api
+    restart: unless-stopped
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    environment:
+      APP_PORT: 3000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_SSLMODE: disable
+    ports:
+      - "3000:3000"
+
 volumes:
   postgres_data:
