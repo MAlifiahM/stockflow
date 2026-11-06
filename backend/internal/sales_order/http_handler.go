@@ -30,9 +30,52 @@ func NewHttpHandler(
 		logger:        logger,
 	}
 
+	r.Get("/", handler.FindSalesOrders)
 	r.Post("/", validation.New[domain.SalesOrderStoreRequest](), handler.StoreSalesOrder)
 	r.Post("/:id/cancel", handler.CancelSalesOrder)
 	r.Get("/:id", handler.FindSalesOrder)
+}
+
+func (h *HttpSalesOrderHandler) FindSalesOrders(c fiber.Ctx) error {
+	payload := new(domain.SalesOrderPaginationRequest)
+	if err := c.Bind().Query(payload); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(&domain.ErrorDetail{
+			Error: &domain.ErrorCodeDetail{
+				Code: "INVALID_QUERY_PARAMETERS",
+			},
+		})
+	}
+
+	salesOrders, count, err := h.salesOrderSvc.Find(payload)
+	if err != nil {
+		utilities.LogError(
+			h.logger,
+			"HttpSalesOrderHandler",
+			"FindSalesOrders",
+			nil,
+			err,
+			"failed to find sales orders",
+		)
+
+		return c.Status(fiber.StatusInternalServerError).JSON(&domain.ErrorDetail{
+			Error: &domain.ErrorCodeDetail{
+				Code: "FAILED_TO_FIND_SALES_ORDERS",
+			},
+		})
+	}
+
+	totalPages := count / int64(payload.Limit)
+	if count%int64(payload.Limit) != 0 {
+		totalPages++
+	}
+
+	return c.Status(fiber.StatusOK).JSON(domain.PaginationResponse{
+		Data:       salesOrders,
+		Page:       int64(payload.Page),
+		Limit:      int64(payload.Limit),
+		TotalPages: totalPages,
+		TotalItems: count,
+	})
 }
 
 func (h *HttpSalesOrderHandler) StoreSalesOrder(c fiber.Ctx) error {
