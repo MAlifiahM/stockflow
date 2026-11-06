@@ -1,0 +1,17 @@
+INSERT INTO stock_movements(product_id, type, qty, note) VALUES
+((SELECT id FROM products WHERE sku = 'EL-001'), 'in', 27, 'Initial supplier restock'),
+((SELECT id FROM products WHERE sku = 'EL-002'), 'in', 43, 'Initial supplier restock'),
+((SELECT id FROM products WHERE sku = 'EL-003'), 'in', 15, 'Initial supplier restock'),
+((SELECT id FROM products WHERE sku = 'EL-004'), 'in', 13, 'Initial supplier restock'),
+((SELECT id FROM products WHERE sku = 'EL-005'), 'in', 30, 'Initial supplier restock'),
+((SELECT id FROM products WHERE sku = 'EL-006'), 'in', 20, 'Initial supplier restock'),
+((SELECT id FROM products WHERE sku = 'EL-007'), 'in', 20, 'Initial supplier restock'),
+((SELECT id FROM products WHERE sku = 'EL-008'), 'in', 50, 'Initial supplier restock'),
+((SELECT id FROM products WHERE sku = 'EL-009'), 'in', 10, 'Initial supplier restock'),
+((SELECT id FROM products WHERE sku = 'EL-010'), 'in', 35, 'Initial supplier restock'),
+((SELECT id FROM products WHERE sku = 'EL-011'), 'in', 60, 'Initial supplier restock'),
+((SELECT id FROM products WHERE sku = 'EL-012'), 'in', 14, 'Initial supplier restock'),
+((SELECT id FROM products WHERE sku = 'EL-001'), 'out', 2, 'Sales order PT Maju Jaya'),
+((SELECT id FROM products WHERE sku = 'EL-002'), 'out', 3, 'Sales order PT Maju Jaya'),
+((SELECT id FROM products WHERE sku = 'EL-004'), 'out', 1, 'Sales order CV Teknologi'),
+((SELECT id FROM products WHERE sku = 'EL-006'), 'out', 2, 'Sales order CV Teknologi');
