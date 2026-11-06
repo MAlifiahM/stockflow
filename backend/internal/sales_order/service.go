@@ -474,3 +474,66 @@ func (s *salesOrderService) FindByID(id int32) (*domain.SalesOrderStoreResponse,
 
 	return resp, nil
 }
+
+func (s *salesOrderService) Find(payload *domain.SalesOrderPaginationRequest) ([]domain.SalesOrderPaginationResponse, int64, error) {
+	if payload.Page <= 0 {
+		payload.Page = 1
+	}
+
+	if payload.Limit <= 0 {
+		payload.Limit = 1
+	}
+
+	if len(payload.Search) > 150 {
+		utilities.LogError(
+			s.logger,
+			"SalesOrderService",
+			"Find",
+			nil,
+			fmt.Errorf("search len is %d", len(payload.Search)),
+			"search length exceeds 150 characters",
+		)
+		return nil, 0, fmt.Errorf("search length exceeds 150 characters")
+	}
+
+	salesOrders, count, err := s.salesOrderRepo.Find(payload)
+	if err != nil {
+		utilities.LogError(
+			s.logger,
+			"SalesOrderService",
+			"Find",
+			nil,
+			err,
+			"failed to find sales orders",
+		)
+		return nil, 0, fmt.Errorf("failed to find sales orders")
+	}
+
+	resp := make([]domain.SalesOrderPaginationResponse, 0, len(salesOrders))
+	for _, order := range salesOrders {
+		orderResp := domain.SalesOrderPaginationResponse{
+			ID:          order.ID,
+			Customer:    order.Customer,
+			Status:      order.Status,
+			Total:       order.Total,
+			CreatedAt:   order.CreatedAt,
+			CancelledAt: order.CancelledAt,
+		}
+
+		if len(order.Items) > 0 {
+			items := make([]domain.SalesOrderItemStoreResponse, 0, len(order.Items))
+			for _, item := range order.Items {
+				items = append(items, domain.SalesOrderItemStoreResponse{
+					SKU:       item.SKU,
+					Qty:       item.Qty,
+					UnitPrice: item.UnitPrice,
+				})
+			}
+			orderResp.Items = items
+		}
+
+		resp = append(resp, orderResp)
+	}
+
+	return resp, count, nil
+}

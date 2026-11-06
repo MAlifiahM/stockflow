@@ -48,15 +48,33 @@ type SalesOrderCancelledResponse struct {
 	CancelledAt *time.Time `json:"cancelled_at,omitempty"`
 }
 
+type SalesOrderPaginationRequest struct {
+	Page   int    `query:"page"`
+	Limit  int    `query:"limit"`
+	Search string `query:"search"`
+}
+
+type SalesOrderPaginationResponse struct {
+	ID          int32                         `json:"id"`
+	Customer    string                        `json:"customer"`
+	Status      string                        `json:"status"`
+	Total       int32                         `json:"total"`
+	CreatedAt   time.Time                     `json:"created_at"`
+	CancelledAt *time.Time                    `json:"cancelled_at,omitempty"`
+	Items       []SalesOrderItemStoreResponse `json:"items,omitempty"`
+}
+
 type SalesOrderRepository interface {
 	WithTx(tx *gorm.DB) SalesOrderRepository
 	Create(payload *SalesOrder) error
 	FindByID(id int32) (*SalesOrder, error)
 	Updates(id int32, updates map[string]interface{}) error
+	Find(payload *SalesOrderPaginationRequest) ([]SalesOrder, int64, error)
 }
 
 type SalesOrderService interface {
 	Store(payload *SalesOrderStoreRequest) (*SalesOrderStoreResponse, error)
 	Cancel(id int32) (*SalesOrderCancelledResponse, error)
 	FindByID(id int32) (*SalesOrderStoreResponse, error)
+	Find(payload *SalesOrderPaginationRequest) ([]SalesOrderPaginationResponse, int64, error)
 }
