@@ -10,10 +10,23 @@ Inventory & Sales Management System
 ## Run
 
 ### Database with migration and seeder only
-```bash
-docker compose up -d db migrate seed
-```
+- copy .env from .env.example
+    ```bash
+    cp .env.example .env
+    ```
+
+- update content .env
+- run docker compose for database, migrate and seed
+    ```bash
+    docker compose up -d db migrate seed
+    ```
 ### Backend only
-```bash
-docker compose up -d backend
-```
+- copy .env from .env.example in backend folder
+    ```bash
+    cp .env.example .env
+    ```
+- update content .env in backend folder
+- run backend after running database with migrate and seed
+    ```bash
+    docker compose up -d backend
+    ```
